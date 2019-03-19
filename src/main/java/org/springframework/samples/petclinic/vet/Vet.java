@@ -76,4 +76,8 @@ public class Vet extends Person {
 		getSpecialtiesInternal().add(specialty);
 	}
 
+	public String toString() {
+		return getFirstName() + " " + getLastName();
+	}
+
 }

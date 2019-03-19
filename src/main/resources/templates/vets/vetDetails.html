@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+
+  <body>
+  
+  
+    <h2>Vet Information</h2>
+  
+  
+    <table class="table table-striped" th:object="${vet}">
+      <tr>
+        <th>Name</th>
+        <td><b th:text="*{firstName + ' ' + lastName}"></b></td>
+      </tr>
+      <tr>
+        <th>Specialties</th>
+        <td><span th:each="specialty : ${vet.specialties}"
+          th:text="${specialty.name + ' '}" /> <span
+          th:if="${vet.nrOfSpecialties == 0}">none</span></td>
+      </tr>
+    </table>
+  
+    <br />
+    <br />
+    <br />
+    <h2>Visits</h2>
+  
+    <table class="table table-striped">
+  
+      <tr th:each="visit : ${visits}">
+        <td valign="top">
+          <dl class="dl-horizontal">
+            <dt>Date</dt>
+            <dd
+              th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}" /></dd>
+            <dt>Pet</dt>
+            <dd th:text="${visit.pet.name}" /></dd>
+            <dt>Type</dt>
+            <dd th:text="${visit.pet.type}" /></dd>
+            <dt>Owner</dt>
+            <dd>
+                <a th:href="@{/owners/__${visit.pet.owner.id}__}" th:text="${visit.pet.owner.firstName + ' ' + visit.pet.owner.lastName}"/></a>
+            </dd>
+            <dt>Description</dt>
+            <dd th:text="${visit.description}" /></dd>
+          </dl>
+        </td>
+      </tr>
+    </table>  
+  </body>
+
+</html>

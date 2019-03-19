@@ -15,10 +15,13 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import java.util.Collection;
 import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.springframework.samples.petclinic.vet.Vet;
+import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
@@ -44,9 +47,12 @@ class VisitController {
 
 	private final PetRepository pets;
 
-	public VisitController(VisitRepository visits, PetRepository pets) {
+	private final VetRepository vets;
+
+	public VisitController(VisitRepository visits, PetRepository pets, VetRepository vets) {
 		this.visits = visits;
 		this.pets = pets;
+		this.vets = vets;
 	}
 
 	@InitBinder
@@ -64,11 +70,18 @@ class VisitController {
 	@ModelAttribute("visit")
 	public Visit loadPetWithVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
 		Pet pet = this.pets.findById(petId);
-		pet.setVisitsInternal(this.visits.findByPetId(petId));
+		pet.setVisitsInternal(this.visits.findByPet(pet));
 		model.put("pet", pet);
 		Visit visit = new Visit();
 		pet.addVisit(visit);
 		return visit;
+	}
+
+	@ModelAttribute("vets")
+	public Collection<Vet> loadVets(Map<String, Object> model) {
+		Collection<Vet> vets = this.vets.findAll();
+		model.put("vets", vets);
+		return vets;
 	}
 
 	// Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is called

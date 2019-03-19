@@ -28,6 +28,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan.Filter;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.samples.petclinic.vet.Vet;
+import org.springframework.samples.petclinic.vet.VetFormatter;
+import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -36,10 +41,13 @@ import org.springframework.test.web.servlet.MockMvc;
  *
  * @author Colin But
  */
-@WebMvcTest(VisitController.class)
+@WebMvcTest(controllers = VisitController.class,
+		includeFilters = @Filter(classes = VetFormatter.class, type = FilterType.ASSIGNABLE_TYPE))
 class VisitControllerTests {
 
 	private static final int TEST_PET_ID = 1;
+
+	private static final String TEST_VET_NAME = "Linda Douglas";
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -50,9 +58,13 @@ class VisitControllerTests {
 	@MockBean
 	private PetRepository pets;
 
+	@MockBean
+	private VetRepository vets;
+
 	@BeforeEach
 	void init() {
 		given(this.pets.findById(TEST_PET_ID)).willReturn(new Pet());
+		given(this.vets.findByName(TEST_VET_NAME)).willReturn(new Vet());
 	}
 
 	@Test
@@ -64,8 +76,8 @@ class VisitControllerTests {
 	@Test
 	void testProcessNewVisitFormSuccess() throws Exception {
 		mockMvc.perform(post("/owners/*/pets/{petId}/visits/new", TEST_PET_ID).param("name", "George")
-				.param("description", "Visit Description")).andExpect(status().is3xxRedirection())
-				.andExpect(view().name("redirect:/owners/{ownerId}"));
+				.param("vet", TEST_VET_NAME).param("description", "Visit Description"))
+				.andExpect(status().is3xxRedirection()).andExpect(view().name("redirect:/owners/{ownerId}"));
 	}
 
 	@Test

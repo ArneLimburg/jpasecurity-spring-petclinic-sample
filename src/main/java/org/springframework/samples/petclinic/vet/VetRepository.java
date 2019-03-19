@@ -19,7 +19,9 @@ import java.util.Collection;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -42,5 +44,15 @@ public interface VetRepository extends Repository<Vet, Integer> {
 	@Transactional(readOnly = true)
 	@Cacheable("vets")
 	Collection<Vet> findAll() throws DataAccessException;
+
+	/**
+	 * Retrieve a {@link Vet} from the data store by id.
+	 * @param id the id to search for
+	 * @return the {@link Vet} if found
+	 */
+	Vet findById(@Param("id") Integer id);
+
+	@Query("SELECT vet FROM Vet vet WHERE CONCAT(vet.firstName, ' ', vet.lastName) = :name")
+	Vet findByName(@Param("name") String name);
 
 }

@@ -15,9 +15,12 @@
  */
 package org.springframework.samples.petclinic.vet;
 
+import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Map;
 
@@ -32,8 +35,11 @@ class VetController {
 
 	private final VetRepository vets;
 
-	public VetController(VetRepository clinicService) {
+	private final VisitRepository visits;
+
+	public VetController(VetRepository clinicService, VisitRepository visits) {
 		this.vets = clinicService;
+		this.visits = visits;
 	}
 
 	@GetMapping("/vets.html")
@@ -53,6 +59,15 @@ class VetController {
 		Vets vets = new Vets();
 		vets.getVetList().addAll(this.vets.findAll());
 		return vets;
+	}
+
+	@GetMapping("/vets/{vetId}")
+	public ModelAndView showVet(@PathVariable("vetId") int vetId) {
+		ModelAndView mav = new ModelAndView("vets/vetDetails");
+		Vet vet = this.vets.findById(vetId);
+		mav.addObject(vet);
+		mav.addObject("visits", this.visits.findByVet(vet));
+		return mav;
 	}
 
 }

@@ -203,8 +203,10 @@ class ClinicServiceTests {
 	@Transactional
 	void shouldAddNewVisitForPet() {
 		Pet pet7 = this.pets.findById(7);
+		Vet vet3 = this.vets.findById(3);
 		int found = pet7.getVisits().size();
 		Visit visit = new Visit();
+		visit.setVet(vet3);
 		pet7.addVisit(visit);
 		visit.setDescription("test");
 		this.visits.save(visit);
@@ -217,11 +219,12 @@ class ClinicServiceTests {
 
 	@Test
 	void shouldFindVisitsByPetId() throws Exception {
-		Collection<Visit> visits = this.visits.findByPetId(7);
+		Pet pet7 = this.pets.findById(7);
+		Collection<Visit> visits = this.visits.findByPet(pet7);
 		assertThat(visits).hasSize(2);
 		Visit[] visitArr = visits.toArray(new Visit[visits.size()]);
 		assertThat(visitArr[0].getDate()).isNotNull();
-		assertThat(visitArr[0].getPetId()).isEqualTo(7);
+		assertThat(visitArr[0].getPet().getId()).isEqualTo(7);
 	}
 
 }
